@@ -18,3 +18,11 @@ You are 100% responsible for where you point this.
 ### One-command usage
 ```bash
 python run.py -u https://target.com
+
+### Installation
+git clone https://github.com/petasplit/Ares.git
+cd Ares
+pip install -r requirements.txt
+playwright install chromium
+ollama pull llama3:8b          # optional but god-tier
+python run.py -u https://authorized-target.com
