@@ -26,3 +26,14 @@ pip install -r requirements.txt
 playwright install chromium
 ollama pull llama3:8b          # optional but god-tier
 python run.py -u https://authorized-target.com
+
+### Setup
+pip install -r requirements.txt
+playwright install chromium
+ollama pull llama3:8b          # optional, but makes payloads unholy
+
+### How to use once setup
+git clone https://github.com/yourname/ultimate-sqli-tool.git
+cd ultimate-sqli-tool
+nano config.py          # put your IP / callback domain
+python run.py -u https://bugbounty-target.com
