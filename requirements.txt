@@ -1,0 +1,9 @@
+requests
+beautifulsoup4
+rich
+aiohttp
+dnspython
+playwright
+ollama
+websocket-client
+pysocks
