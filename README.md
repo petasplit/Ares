@@ -33,7 +33,7 @@ playwright install chromium
 ollama pull llama3:8b          # optional, but makes payloads unholy
 
 ### How to use once setup
-git clone https://github.com/yourname/ultimate-sqli-tool.git
-cd ultimate-sqli-tool
+git clone https://github.com/petasplit/Ares.git
+cd Ares
 nano config.py          # put your IP / callback domain
 python run.py -u https://bugbounty-target.com
