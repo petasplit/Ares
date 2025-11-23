@@ -17,7 +17,7 @@ You are 100% responsible for where you point this.
 
 ### One-command usage
 ```bash
-python run.py -u https://target.com
+python run.py 
 
 ### Installation
 git clone https://github.com/petasplit/Ares.git
@@ -25,7 +25,7 @@ cd Ares
 pip install -r requirements.txt
 playwright install chromium
 ollama pull llama3:8b          # optional but god-tier
-python run.py -u https://authorized-target.com
+python run.py (It will ask for target URL)
 
 ### Setup
 pip install -r requirements.txt
@@ -36,4 +36,4 @@ ollama pull llama3:8b          # optional, but makes payloads unholy
 git clone https://github.com/petasplit/Ares.git
 cd Ares
 nano config.py          # put your IP / callback domain
-python run.py -u https://bugbounty-target.com
+python run.py (It will ask for target URL)
