@@ -1,4 +1,4 @@
-# Ultimate SQLi Tool v3.0 — FINAL
+# Ares v. 1.0
 
 The most powerful, autonomous, AI-enhanced SQL injection suite ever built.
 
